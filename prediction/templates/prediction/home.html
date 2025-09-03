@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Disease Prediction</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f7fb;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        header {
+            background: #0077b6;
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 30px auto;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        h2, h3 {
+            margin-bottom: 15px;
+            color: #023e8a;
+        }
+
+        .nav {
+            text-align: right;
+            margin-bottom: 15px;
+        }
+
+        .nav a {
+            margin-left: 15px;
+            text-decoration: none;
+            color: #0077b6;
+            font-weight: 500;
+        }
+
+        label {
+            font-weight: 500;
+            display: block;
+            margin-top: 10px;
+        }
+
+        select, input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 0.95rem;
+        }
+
+        button {
+            background: #0077b6;
+            color: white;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #023e8a;
+        }
+
+        .result {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        /* Chatbot */
+        .chatbox {
+            height: 250px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 12px;
+            overflow-y: auto;
+            background: #fafafa;
+        }
+
+        .chatbox p {
+            margin: 8px 0;
+            font-size: 0.95rem;
+        }
+
+        .chatbox strong {
+            color: #0077b6;
+        }
+
+        #user-input {
+            width: 78%;
+            display: inline-block;
+            border-radius: 8px 0 0 8px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        #chatbot-form button {
+            width: 20%;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* Hospital Finder */
+        #hospital-results p {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 8px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        @media(max-width: 768px) {
+            #user-input, #chatbot-form button {
+                width: 100%;
+                border-radius: 8px;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>Disease Prediction System</header>
+    <div class="container">
+
+        <!-- Disease Prediction -->
+        <div class="card">
+            <div class="nav">
+                <a href="{% url 'home' %}">Home</a> | 
+                <a href="{% url 'contact' %}">Contact</a>
+            </div>
+
+            <h2>🩺 Disease Prediction</h2>
+            <form method="post" onsubmit="submitForm(event)">
+                {% csrf_token %}
+
+                <label for="disease">Choose Disease Type:</label>
+                <select id="disease" name="disease" onchange="showFormFields()" required>
+                    <option value="">-- Select --</option>
+                    <option value="heart">Heart Disease</option>
+                    <option value="diabetes">Diabetes</option>
+                    <option value="liver">Liver Disease</option>
+                </select>
+
+                <!-- Forms (hidden until selected) -->
+                <div id="heart-form" class="disease-form" style="display:none;">
+                    <input type="number" name="age" placeholder="Age">
+                    <input type="number" name="sex" placeholder="Sex (1=Male,0=Female)">
+                    <input type="number" name="cp" placeholder="Chest Pain Type">
+                    <input type="number" name="trestbps" placeholder="Resting Blood Pressure">
+                    <input type="number" name="chol" placeholder="Cholesterol">
+                    <input type="number" name="fbs" placeholder="Fasting Blood Sugar">
+                    <input type="number" name="restecg" placeholder="Resting ECG">
+                    <input type="number" name="thalach" placeholder="Max Heart Rate">
+                    <input type="number" name="exang" placeholder="Exercise Induced Angina">
+                    <input type="text" name="oldpeak" placeholder="ST Depression">
+                    <input type="number" name="slope" placeholder="Slope">
+                    <input type="number" name="ca" placeholder="Major Vessels (0-3)">
+                    <input type="number" name="thal" placeholder="Thal Value">
+                </div>
+
+                <div id="diabetes-form" class="disease-form" style="display:none;">
+                    <input type="number" name="age" placeholder="Age">
+                    <input type="number" name="hypertension" placeholder="Hypertension (1/0)">
+                    <input type="number" name="heart_disease" placeholder="Heart Disease (1/0)">
+                    <input type="number" name="bmi" placeholder="BMI">
+                    <input type="number" name="HbA1c_level" placeholder="HbA1c Level">
+                    <input type="number" name="blood_glucose_level" placeholder="Blood Glucose Level">
+                    <select name="gender">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <select name="smoking_history">
+                        <option value="never">Never</option>
+                        <option value="former">Former</option>
+                        <option value="current">Current</option>
+                        <option value="ever">Ever</option>
+                        <option value="not current">Not Current</option>
+                    </select>
+                </div>
+
+                <div id="liver-form" class="disease-form" style="display:none;">
+                    <input type="number" name="Age" placeholder="Age">
+                    <input type="number" name="Gender" placeholder="Gender (1=Male,0=Female)">
+                    <input type="number" name="BMI" placeholder="BMI">
+                    <input type="number" name="AlcoholConsumption" placeholder="Alcohol Consumption">
+                    <input type="number" name="Smoking" placeholder="Smoking (1/0)">
+                    <input type="number" name="GeneticRisk" placeholder="Genetic Risk (1/0)">
+                    <input type="number" name="PhysicalActivity" placeholder="Physical Activity">
+                    <input type="number" name="Diabetes" placeholder="Diabetes (1/0)">
+                    <input type="number" name="Hypertension" placeholder="Hypertension (1/0)">
+                    <input type="number" name="LiverFunctionTest" placeholder="Liver Function Test">
+                </div>
+
+                <button type="submit">Predict</button>
+            </form>
+            <div id="result" class="result"></div>
+        </div>
+
+        <!-- Chatbot -->
+        <div class="card">
+            <h3>💬 Chat with our Assistant</h3>
+            <div class="chatbox" id="chat-box">
+                <p><strong>Bot:</strong> Hello, how can I help you with your symptoms?</p>
+            </div>
+            <form id="chatbot-form">
+                {% csrf_token %}
+                <input type="text" id="user-input" name="message" placeholder="Type your question here...">
+                <button type="submit">Send</button>
+            </form>
+        </div>
+
+        <!-- Hospital Finder -->
+        <div class="card">
+            <h3>🏥 Find Nearby Hospitals</h3>
+            <button onclick="findHospitals()">Find Hospitals Near Me</button>
+            <div id="hospital-results"></div>
+        </div>
+    </div>
+
+    <script>
+        async function submitForm(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+
+            const response = await fetch("{% url 'predict' %}", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+            const resultDiv = document.getElementById("result");
+
+            if (data.error) {
+                resultDiv.innerHTML = "❌ " + data.error;
+                resultDiv.style.color = "red";
+            } else {
+                resultDiv.innerHTML = "✅ Prediction: " + data.prediction;
+                resultDiv.style.color = "green";
+            }
+        }
+
+        function showFormFields() {
+            const disease = document.getElementById("disease").value;
+            const sections = document.querySelectorAll(".disease-form");
+            sections.forEach(sec => sec.style.display = "none");
+            if (disease) {
+                document.getElementById(disease + "-form").style.display = "block";
+            }
+        }
+
+        // Chatbot handler
+        document.getElementById('chatbot-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const userInput = document.getElementById('user-input').value;
+            const chatBox = document.getElementById('chat-box');
+
+            if (userInput.trim() === '') return;
+
+            chatBox.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
+            document.getElementById('user-input').value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            const formData = new FormData();
+            formData.append('message', userInput);
+
+            fetch('/chatbot/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': this.querySelector('input[name="csrfmiddlewaretoken"]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                chatBox.innerHTML += `<p><strong>Bot:</strong> ${data.message}</p>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Hospital finder
+        function findHospitals() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+
+                        fetch('/hospitals/', {
+                            method: 'POST',
+                            body: JSON.stringify({ lat, lon }),
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            const resultsDiv = document.getElementById('hospital-results');
+                            resultsDiv.innerHTML = '';
+                            if (data.hospitals && data.hospitals.length > 0) {
+                                data.hospitals.forEach(hospital => {
+                                    resultsDiv.innerHTML += `
+                                        <p><strong>${hospital.name}</strong><br>${hospital.address}</p>
+                                    `;
+                                });
+                            } else {
+                                resultsDiv.innerHTML = '<p>No hospitals found nearby.</p>';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            document.getElementById('hospital-results').innerHTML = '<p>Failed to fetch hospitals.</p>';
+                        });
+                    },
+                    (error) => {
+                        alert('Geolocation failed: ' + error.message);
+                    }
+                );
+            } else {
+                alert('Your browser does not support geolocation.');
+            }
+        }
+    </script>
+</body>
+</html>

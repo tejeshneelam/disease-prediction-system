@@ -1,0 +1,26 @@
+# .gitignore
+
+# ----------------- Virtual Environment -----------------
+# The virtual environment folder, which contains all the project's dependencies.
+# This should not be committed because each user can create their own.
+venv/
+
+# ----------------- Project-specific Files -----------------
+# The file where your secret API key is stored. NEVER commit this.
+.env
+
+# Files created by Django's database, as the database itself is not version-controlled.
+db.sqlite3
+
+# Files created by the Django development server.
+.DS_Store # Mac-specific file
+
+# ----------------- Python-specific Files -----------------
+# Bytecode and compiled files created by Python.
+__pycache__/
+*.pyc
+
+# ----------------- Machine Learning Files -----------------
+# The saved machine learning models. These are typically too large for Git
+# and can be regenerated from your training scripts.
+*.pkl
